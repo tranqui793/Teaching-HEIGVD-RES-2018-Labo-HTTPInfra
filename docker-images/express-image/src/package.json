@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/tranqui793/Teaching-HEIGVD-RES-2018-Labo-HTTPInfra#readme",
   "dependencies": {
-    "chance": "^1.0.16"
+    "chance": "^1.0.16",
+    "express": "^4.16.3"
   }
 }
