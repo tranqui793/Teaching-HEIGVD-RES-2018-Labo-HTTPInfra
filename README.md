@@ -26,6 +26,8 @@ The third objective is to practice our usage of **Docker**. All the components o
 
 * [Labo HTTP (1): Serveur apache httpd "dockerisé" servant du contenu statique](https://www.youtube.com/watch?v=XFO4OmcfI3U)
 
+Choisi image php apache image
+
 ### Acceptance criteria
 
 * You have a GitHub repo with everything needed to build the Docker image.
