@@ -18,7 +18,10 @@ done
 staticIP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' apache_php)
 dynamicIP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' express_locations)
 
-echo -e "\nPrincipal static server running on $staticIP \nPrincipal dynamic server running on $dynamicIP "
+echo -e "\nPrincipal static server running on $staticIP \nPrincipal dynamic server running on $dynamicIP"
+
+echo -e "\nReverse proxy running ..."
+docker run -d -p 8080:80 -e STATIC_APP=172.17.0.3 -e DYNAMIC_APP=172.17.0.5:3000 --name apache_rp res/apache_rp
 
 echo -e "\nRunning portainer managment UI ..."
 docker volume rm portainer_data > /dev/null 2>&1
