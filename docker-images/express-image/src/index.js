@@ -21,7 +21,7 @@ app.listen(3000, function () {
 function generateLocations() {
 
 	var numberOfLocations = chance.integer({
-		min: 0,
+		min: 1,
 		max: 10
 	});
 
