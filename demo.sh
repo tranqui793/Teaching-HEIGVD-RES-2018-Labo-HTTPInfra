@@ -5,23 +5,35 @@ echo "Killing old containers ..."
 docker kill $(docker ps -q) 2>/dev/null 
 docker rm $(docker ps -a -q) 2>/dev/null
 
-echo -e "\nRunning $1 server containers including the 2 principals..."
-docker run -d -it --name apache_php res/apache_php 
-docker run -d -it --name express_locations res/express_dynamic 
+echo -e "\nRunning server containers ...."
 
-for i in `seq 2 $1`
-do
-	docker run -d -it res/apache_php
-	docker run -d -it res/express_dynamic
-done
+	docker run -d -it --name static1 res/apache_php
+	staticIP1=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' static1)
 
-staticIP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' apache_php)
-dynamicIP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' express_locations)
+	docker run -d -it --name static2 res/apache_php
+        staticIP2=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' static2)
 
-echo -e "\nPrincipal static server running on $staticIP \nPrincipal dynamic server running on $dynamicIP"
+	docker run -d -it --name static3 res/apache_php
+        staticIP3=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' static3)
+
+	docker run -d -it --name dynamic1 res/express_dynamic
+	dynamicIP1=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' dynamic1)
+
+
+	docker run -d -it --name dynamic2 res/express_dynamic
+        dynamicIP2=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' dynamic2)
+
+        docker run -d -it --name dynamic3 res/express_dynamic
+        dynamicIP3=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' dynamic3)
+
+
+echo -e "\nStatics server running on $staticIP1 $staticIP2 $staticIP2 \nDynamics server running on $dynamicIP1 $dynamicIP2 $dynamicIP3"
 
 echo -e "\nReverse proxy running ..."
-docker run -d -p 8080:80 -e STATIC_APP=$staticIP -e DYNAMIC_APP=$dynamicIP:3000 --name apache_rp res/apache_rp
+docker run -d -p 8080:80 -e STATIC_APP1=$staticIP1 -e DYNAMIC_APP1=$dynamicIP1:3000 \
+			 -e STATIC_APP2=$staticIP1 -e DYNAMIC_APP2=$dynamicIP2:3000 \
+			 -e STATIC_APP3=$staticIP1 -e DYNAMIC_APP3=$dynamicIP3:3000 \
+ --name apache_rp res/apache_rp
 
 echo -e "\nRunning portainer managment UI ..."
 docker volume rm portainer_data > /dev/null 2>&1
@@ -31,3 +43,4 @@ docker run -d --name portainer -v /var/run/docker.sock:/var/run/docker.sock -v p
 portainerIP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' portainer)
 
 echo -e "\nPortainer managment UI running on $portainerIP:9000"
+
